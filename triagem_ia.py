@@ -206,34 +206,71 @@ def salvar_matriz_confusao(
     salvar_matriz_confusao_svg(matriz, nomes, saida_svg)
 
 
+from typing import Any
+from pathlib import Path
+
 def salvar_matriz_confusao_svg(matriz: Any, nomes: list[str], saida_svg: Path) -> None:
-    largura = 720
-    altura = 640
-    margem_esquerda = 160
-    margem_topo = 120
+    # Largura aumentada para acomodar a nova coluna de Precisão
+    largura = 1100 
+    altura = 680
+    margem_esquerda = 180
+    margem_topo = 160
     tamanho_celula = 100
     maximo = max(int(matriz.max()), 1)
+
+    centro_x = largura / 2
+    centro_matriz_x = margem_esquerda + (len(nomes) * tamanho_celula) / 2
+
+    # Cálculo da Acurácia Geral do modelo
+    acertos = sum(float(matriz[i][i]) for i in range(len(nomes)))
+    total_casos = sum(sum(float(valor) for valor in linha) for linha in matriz)
+    acuracia = acertos / total_casos if total_casos > 0 else 0.0
 
     partes = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{largura}" height="{altura}" viewBox="0 0 {largura} {altura}">',
         '<rect width="100%" height="100%" fill="#ffffff"/>',
-        '<text x="360" y="42" text-anchor="middle" font-family="Arial" font-size="24" font-weight="700" fill="#1f2937">Matriz de Confusao</text>',
-        '<text x="360" y="76" text-anchor="middle" font-family="Arial" font-size="14" fill="#4b5563">Modelo intermediario - linhas reais, colunas preditas</text>',
-        f'<text x="{margem_esquerda + 200}" y="104" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#374151">Predito</text>',
-        f'<text x="32" y="{margem_topo + 205}" transform="rotate(-90 32 {margem_topo + 205})" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#374151">Real</text>',
+        f'<text x="{centro_x}" y="42" text-anchor="middle" font-family="Arial" font-size="24" font-weight="700" fill="#1f2937">Matriz de Confusão com Métricas</text>',
+        # Acurácia adicionada ao subtítulo
+        f'<text x="{centro_x}" y="76" text-anchor="middle" font-family="Arial" font-size="14" fill="#4b5563">Modelo intermediário - linhas reais, colunas preditas | Acurácia Geral: {acuracia:.2%}</text>',
+        f'<text x="{centro_matriz_x}" y="110" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#374151">Predito</text>',
+        f'<text x="40" y="{margem_topo + 200}" transform="rotate(-90 40 {margem_topo + 200})" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#374151">Real</text>',
     ]
 
     for coluna, nome in enumerate(nomes):
         x = margem_esquerda + coluna * tamanho_celula + tamanho_celula / 2
         partes.append(
-            f'<text x="{x}" y="{margem_topo - 18}" text-anchor="middle" font-family="Arial" font-size="13" fill="#374151">{nome}</text>'
+            f'<text x="{x}" y="{margem_topo - 20}" text-anchor="middle" font-family="Arial" font-size="14" fill="#374151">{nome}</text>'
         )
+
+    # Cabeçalhos das colunas de métricas, agora com Precisão
+    base_metricas = margem_esquerda + len(nomes) * tamanho_celula
+    x_precision = base_metricas + 80
+    x_recall = base_metricas + 180
+    x_f1 = base_metricas + 280
+    
+    partes.append(f'<text x="{x_precision}" y="{margem_topo - 20}" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#374151">Precisão</text>')
+    partes.append(f'<text x="{x_recall}" y="{margem_topo - 20}" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#374151">Recall</text>')
+    partes.append(f'<text x="{x_f1}" y="{margem_topo - 20}" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#374151">F1-Score</text>')
 
     for linha, nome in enumerate(nomes):
         y = margem_topo + linha * tamanho_celula + tamanho_celula / 2 + 5
         partes.append(
             f'<text x="{margem_esquerda - 16}" y="{y}" text-anchor="end" font-family="Arial" font-size="13" fill="#374151">{nome}</text>'
         )
+
+        # Cálculo das métricas da classe atual
+        tp = float(matriz[linha][linha])
+        fn = float(sum(matriz[linha]) - tp)
+        fp = float(sum(matriz[i][linha] for i in range(len(nomes))) - tp)
+        
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+
+        # Adiciona os textos na nova formatação de colunas
+        partes.append(f'<text x="{x_precision}" y="{y}" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#ea580c">{precision:.3f}</text>')
+        partes.append(f'<text x="{x_recall}" y="{y}" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#2563eb">{recall:.3f}</text>')
+        partes.append(f'<text x="{x_f1}" y="{y}" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#9333ea">{f1:.3f}</text>')
 
     for linha in range(len(nomes)):
         for coluna in range(len(nomes)):
@@ -354,9 +391,19 @@ def salvar_curva_roc_svg(
         path_d = "M " + " L ".join(pontos_path)
         partes.append(f'<path d="{path_d}" fill="none" stroke="{cor}" stroke-width="3" />')
 
-        legenda_y = margem + i * 25
-        partes.append(f'<rect x="{largura - margem - 200}" y="{legenda_y - 12}" width="16" height="16" fill="{cor}"/>')
-        partes.append(f'<text x="{largura - margem - 170}" y="{legenda_y}" font-family="Arial" font-size="14" fill="#374151">{nome} (AUC = {auc_val:.2f})</text>')
+        # Legenda no canto inferior direito
+        leg_x = margem + int(area_w * 0.56)
+        leg_y = altura - margem - int(area_h * 0.30)
+        leg_w, leg_h = 220, 130
+        partes.append(f'<rect x="{leg_x}" y="{leg_y}" width="{leg_w}" height="{leg_h}" rx="6" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>')
+
+        for i, c in enumerate(fpr_dict.keys()):
+            cor = cores.get(c, "#000000")
+            nome = nomes_classes[c]
+            auc_val = roc_auc[c]
+            item_y = leg_y + 18 + i * 24
+            partes.append(f'<rect x="{leg_x + 12}" y="{item_y}" width="14" height="14" rx="2" fill="{cor}"/>')
+            partes.append(f'<text x="{leg_x + 32}" y="{item_y + 11}" font-family="Arial" font-size="13" fill="#374151">{nome} (AUC = {auc_val:.2f})</text>')
 
     partes.append("</svg>")
     saida_svg.parent.mkdir(parents=True, exist_ok=True)
