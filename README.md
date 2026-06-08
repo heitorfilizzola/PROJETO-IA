@@ -1,4 +1,3 @@
-Aqui está o README completo com todos os erros de português corrigidos:
 
 ---
 
