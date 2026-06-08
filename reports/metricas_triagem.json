@@ -1,0 +1,115 @@
+{
+  "dataset": "data\\synthetic_medical_triage.csv",
+  "linhas": 18000,
+  "distribuicao_classes": {
+    "0": 9924,
+    "1": 4484,
+    "2": 2701,
+    "3": 891
+  },
+  "melhor_modelo": "random_forest_intermediario",
+  "matriz_confusao_csv": "reports\\matriz_confusao.csv",
+  "matriz_confusao_svg": "reports\\matriz_confusao.svg",
+  "curva_roc_csv": "reports\\curva_roc.csv",
+  "curva_roc_svg": "reports\\curva_roc.svg",
+  "resultados": [
+    {
+      "modelo": "baseline_regressao_logistica",
+      "limiar_vermelho": null,
+      "macro_f1": 0.8189,
+      "recall_vermelho": 0.927,
+      "tempo_inferencia_segundos_por_paciente": 1e-06,
+      "atingiu_macro_f1_080": true,
+      "atingiu_recall_vermelho_095": false,
+      "atingiu_inferencia_2s": true,
+      "classification_report": {
+        "Verde": {
+          "precision": 0.9183895538628944,
+          "recall": 0.8503778337531486,
+          "f1-score": 0.8830761182317551,
+          "support": 1985.0
+        },
+        "Amarelo": {
+          "precision": 0.6481113320079522,
+          "recall": 0.7268673355629878,
+          "f1-score": 0.6852338413032054,
+          "support": 897.0
+        },
+        "Laranja": {
+          "precision": 0.8010657193605684,
+          "recall": 0.8351851851851851,
+          "f1-score": 0.8177697189483227,
+          "support": 540.0
+        },
+        "Vermelho": {
+          "precision": 0.8549222797927462,
+          "recall": 0.9269662921348315,
+          "f1-score": 0.889487870619946,
+          "support": 178.0
+        },
+        "accuracy": 0.8211111111111111,
+        "macro avg": {
+          "precision": 0.8056222212560403,
+          "recall": 0.8348491616590382,
+          "f1-score": 0.8188918872758073,
+          "support": 3600.0
+        },
+        "weighted avg": {
+          "precision": 0.8303085509685538,
+          "recall": 0.8211111111111111,
+          "f1-score": 0.8243014832059595,
+          "support": 3600.0
+        }
+      }
+    },
+    {
+      "modelo": "random_forest_intermediario",
+      "limiar_vermelho": 0.2,
+      "macro_f1": 0.9311,
+      "recall_vermelho": 0.9607,
+      "tempo_inferencia_segundos_por_paciente": 4.1e-05,
+      "atingiu_macro_f1_080": true,
+      "atingiu_recall_vermelho_095": true,
+      "atingiu_inferencia_2s": true,
+      "classification_report": {
+        "Verde": {
+          "precision": 0.964781746031746,
+          "recall": 0.9798488664987406,
+          "f1-score": 0.9722569357660585,
+          "support": 1985.0
+        },
+        "Amarelo": {
+          "precision": 0.9050847457627119,
+          "recall": 0.8929765886287625,
+          "f1-score": 0.898989898989899,
+          "support": 897.0
+        },
+        "Laranja": {
+          "precision": 0.9376218323586745,
+          "recall": 0.8907407407407407,
+          "f1-score": 0.9135802469135802,
+          "support": 540.0
+        },
+        "Vermelho": {
+          "precision": 0.9193548387096774,
+          "recall": 0.9606741573033708,
+          "f1-score": 0.9395604395604396,
+          "support": 178.0
+        },
+        "accuracy": 0.9438888888888889,
+        "macro avg": {
+          "precision": 0.9317107907157025,
+          "recall": 0.9310600882929037,
+          "f1-score": 0.9310968803074944,
+          "support": 3600.0
+        },
+        "weighted avg": {
+          "precision": 0.943587148218382,
+          "recall": 0.9438888888888889,
+          "f1-score": 0.9435830690179604,
+          "support": 3600.0
+        }
+      }
+    }
+  ]
+}
