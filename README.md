@@ -55,6 +55,27 @@ reduz o risco de deixar passar uma emergência como se fosse um caso menos grave
 
 ## Dados usados
 
+As fontes citadas no documento do projeto não precisam estar todas fisicamente na pasta final para
+o modelo funcionar. Elas tem papeis diferentes:
+
+- `DATASUS / SIHSUS` : É uma fonte brasileira importante para contextualizar o problema, analisar
+  internacoes, CID-10, idade, UTI, permanencia e desfechos. Porém, esses registros não trazem
+  diretamente a classificação de triagem Manchester (`Verde`, `Amarelo`, `Laranja`, `Vermelho`).
+  Por isso, eles não foram usados no treino supervisionado final.
+- `Emergency CAS Dataset` : Pode ser usado como fonte adicional caso seja necessário comparar com
+  outra base publica de pronto-socorro. Ele não e obrigatorio para executar a versão atual do
+  projeto. [Link](https://www.kaggle.com/datasets/xavierberge/hospital-emergency-dataset)
+- `Patient Triage Dataset` : Dataset sintético de triagem: E a base mais alinhada ao objetivo,
+  porque contém sinais vitais e um rotulo de prioridade. A versão presente no projeto é
+  `data/synthetic_medical_triage.csv`. [Link](https://www.kaggle.com/datasets/emirhanakku/synthetic-medical-triage-priority-dataset)
+- Dados sinteticos / SMOTE: O projeto usa balanceamento com SMOTE no baseline para lidar com
+  classes desbalanceadas. No modelo intermediario, a segurança da classe `Vermelho` é reforçada
+  com um limiar conservador de probabilidade.
+
+Assim, a entrega final fica mais enxuta: Mantém apenas o dataset necessário para treinar e avaliar
+o classificador de triagem. Os arquivos auxiliares do SIHSUS foram removidos porque aumentavam o
+tamanho da pasta e não acrescentavam rotulos utilizaveis para este modelo.
+
 O treino pode utilizar o dataset sintético ideal (`data/synthetic_medical_triage.csv`), porém, para simular um ambiente de pronto-socorro do mundo real com dados orgânicos (sujeitos a ruído de sensores, incerteza humana e omissões no registro), utilizamos o script **`sujar_dados.py`**.
 
 O `sujar_dados.py` gera um novo dataset chamado `data/synthetic_medical_triage_noisy.csv` aplicando:
